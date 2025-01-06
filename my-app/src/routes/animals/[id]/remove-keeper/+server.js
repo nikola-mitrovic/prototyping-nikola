@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getZookeeper, updateZookeeper } from '$lib/db.js';
+import { getZookeeper, updateZookeeper } from '$lib/db/zookeepers.js';
 
 export async function POST({ request, params }) {
     try {

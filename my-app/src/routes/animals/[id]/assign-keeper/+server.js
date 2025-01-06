@@ -1,4 +1,4 @@
-import { assignKeeperToAnimal } from '$lib/db.js';
+import { assignKeeperToAnimal } from '$lib/db/zookeepers.js';
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request, params }) {

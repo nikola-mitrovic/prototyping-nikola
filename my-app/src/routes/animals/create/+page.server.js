@@ -1,4 +1,4 @@
-import { createAnimal } from '$lib/db.js';
+import { createAnimal } from '$lib/db/animals.js';
 import { fail } from '@sveltejs/kit';
 
 export const actions = {

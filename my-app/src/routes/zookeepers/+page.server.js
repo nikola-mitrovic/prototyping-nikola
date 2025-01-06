@@ -1,4 +1,4 @@
-import { getZookeepers } from '$lib/db.js';
+import { getZookeepers } from '$lib/db/zookeepers.js';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

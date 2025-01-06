@@ -1,4 +1,5 @@
-import { getZookeeper, getAnimal } from '$lib/db.js';
+import { getZookeeper } from '$lib/db/zookeepers.js';
+import { getAnimal } from '$lib/db/animals.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
