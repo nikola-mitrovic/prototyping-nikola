@@ -1,26 +1,28 @@
 import { MongoClient, ObjectId } from "mongodb"; // See https://www.mongodb.com/docs/drivers/node/current/quick-start/
-import { DB_URI } from "$env/static/private";
+import { MONGODB_URI } from "$env/static/private";
 
-console.log('DB: Initializing database connection');
+let client = null;
+let db = null;
 
-let client;
-let db;
-
-async function initDb() {
+export async function initDb() {
     try {
-        client = new MongoClient(DB_URI);
+        console.log('DB: Initializing database connection');
+        client = new MongoClient(MONGODB_URI);
         await client.connect();
+        db = client.db('zooDB');
         console.log('DB: Successfully connected to MongoDB');
-        db = client.db("zooDB");
-        return true;
-    } catch (err) {
-        console.error('DB: Failed to connect to MongoDB:', err);
-        return false;
+    } catch (error) {
+        console.error('DB: Error connecting to MongoDB:', error);
+        throw error;
     }
 }
 
-// Initialize connection
-await initDb();
+export async function getDb() {
+    if (!db) {
+        await initDb();
+    }
+    return db;
+}
 
 //////////////////////////////////////////
 // Animals
@@ -337,27 +339,16 @@ export async function getZookeepers() {
 
 // Get zookeeper by id
 export async function getZookeeper(id) {
-    let zookeeper = null;
     try {
-        if (!db) {
-            console.log('DB: Reconnecting to database...');
-            await initDb();
-        }
         console.log('DB: Getting zookeeper with ID:', id);
-        const collection = db.collection("zookeepers");
-        const query = { _id: new ObjectId(id) };
-        zookeeper = await collection.findOne(query);
-        if (!zookeeper) {
-            console.log("DB: No zookeeper with id " + id);
-        } else {
-            zookeeper._id = zookeeper._id.toString();
-            console.log('DB: Found zookeeper:', zookeeper);
-        }
+        const db = await getDb();
+        const keeper = await db.collection('zookeepers').findOne({ _id: new ObjectId(id) });
+        console.log('DB: Found zookeeper:', keeper);
+        return keeper;
     } catch (error) {
         console.error('DB: Error getting zookeeper:', error);
         throw error;
     }
-    return zookeeper;
 }
 
 // Get highest zookeeper ID
@@ -459,6 +450,51 @@ export async function assignKeeperToAnimal(animalId, keeperId) {
         return true;
     } catch (error) {
         console.error('DB: Error assigning keeper to animal:', error);
+        throw error;
+    }
+}
+
+export async function updateZookeeper(id, updatedData) {
+    try {
+        console.log('DB: Updating zookeeper with ID:', id);
+        console.log('DB: Update data:', updatedData);
+        
+        const db = await getDb();
+        const collection = db.collection('zookeepers');
+        
+        // Convert string ID to ObjectId
+        const objectId = new ObjectId(id);
+        console.log('DB: Converted ObjectId:', objectId);
+        
+        // Remove _id from update data if it exists
+        const { _id, ...updateData } = updatedData;
+        console.log('DB: Cleaned update data:', updateData);
+        
+        // If we're removing animal_id, use $unset
+        let updateOperation;
+        if (updateData.animal_id === undefined) {
+            updateOperation = { $unset: { animal_id: "" } };
+        } else {
+            updateOperation = { $set: updateData };
+        }
+        console.log('DB: Update operation:', updateOperation);
+        
+        const result = await collection.updateOne(
+            { _id: objectId },
+            updateOperation
+        );
+        console.log('DB: Update result:', result);
+        
+        if (result.matchedCount === 0) {
+            throw new Error('No document matched the ID');
+        }
+        if (result.modifiedCount === 0) {
+            throw new Error('Document found but not modified');
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('DB: Error updating zookeeper:', error);
         throw error;
     }
 }

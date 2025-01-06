@@ -38,6 +38,32 @@
             assignmentError = 'Failed to assign keeper. Please try again.';
         }
     }
+
+    async function handleRemoveKeeper(keeperId) {
+        console.log('Removing keeper:', keeperId, 'from animal:', animal._id);
+        try {
+            const response = await fetch(`/animals/${animal._id}/remove-keeper`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ keeper_id: keeperId })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                console.log('Removal successful');
+                window.location.reload();
+            } else {
+                console.error('Removal failed:', result.error);
+                assignmentError = result.error;
+            }
+        } catch (error) {
+            console.error('Error removing keeper:', error);
+            assignmentError = 'Failed to remove keeper. Please try again.';
+        }
+    }
 </script>
 
 <div class="container mt-4">
@@ -169,6 +195,11 @@
                                                 </p>
                                             </div>
                                             <div>
+                                                <button class="btn btn-danger btn-sm me-2" 
+                                                        on:click={() => handleRemoveKeeper(keeper._id)}
+                                                        aria-label="Remove keeper">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
                                                 <a href="/zookeepers/{keeper._id}" class="btn btn-primary btn-sm">
                                                     <i class="bi bi-person-badge"></i> View Details
                                                 </a>
