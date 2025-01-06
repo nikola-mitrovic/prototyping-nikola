@@ -343,6 +343,9 @@ export async function getZookeeper(id) {
         console.log('DB: Getting zookeeper with ID:', id);
         const db = await getDb();
         const keeper = await db.collection('zookeepers').findOne({ _id: new ObjectId(id) });
+        if (keeper) {
+            keeper._id = keeper._id.toString(); // Convert ObjectId to string
+        }
         console.log('DB: Found zookeeper:', keeper);
         return keeper;
     } catch (error) {

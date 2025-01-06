@@ -1,4 +1,4 @@
-import { getZookeeper, getAnimals } from '$lib/db.js';
+import { getZookeeper, getAnimal } from '$lib/db.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
@@ -14,29 +14,29 @@ export async function load({ params }) {
 
         // Find the animal assigned to this zookeeper
         let assignedAnimal = null;
-        try {
-            if (zookeeper.animal_id) {
-                // Get all animals and find the one with matching numeric ID
-                const animals = await getAnimals();
-                assignedAnimal = animals.find(animal => animal.id === zookeeper.animal_id);
-                console.log('Looking for animal with ID:', zookeeper.animal_id);
+        if (zookeeper.animal_id) {
+            try {
+                // Get the specific animal directly instead of fetching all animals
+                assignedAnimal = await getAnimal(zookeeper.animal_id);
                 console.log('Found assigned animal:', assignedAnimal);
+            } catch (err) {
+                console.error('Error loading assigned animal:', err);
+                // Continue without the animal data
             }
-        } catch (err) {
-            console.error('Error loading assigned animal:', err);
-            return {
-                zookeeper,
-                assignedAnimal: null,
-                animalError: true
-            };
         }
 
-        console.log('Loaded zookeeper details:', zookeeper);
+        // Return the data in a serializable format
         return {
-            zookeeper,
-            assignedAnimal,
-            animalError: false
+            zookeeper: {
+                ...zookeeper,
+                _id: zookeeper._id.toString()
+            },
+            assignedAnimal: assignedAnimal ? {
+                ...assignedAnimal,
+                _id: assignedAnimal._id.toString()
+            } : null
         };
+
     } catch (err) {
         console.error('Error loading zookeeper:', err);
         throw error(500, {
