@@ -8,12 +8,7 @@
     let selectedZookeeperId = '';
     let assignmentError = '';
 
-    // Add debug logging
-    console.log('Available zookeepers:', availableZookeepers);
-    console.log('Button should be disabled:', !availableZookeepers || availableZookeepers.length === 0);
-
     async function handleAssignZookeeper() {
-        console.log('Assigning zookeeper:', selectedZookeeperId, 'to animal:', animal._id);
         try {
             const response = await fetch(`/animals/${animal._id}/assign-zookeeper`, {
                 method: 'POST',
@@ -26,15 +21,12 @@
             const result = await response.json();
             
             if (response.ok) {
-                console.log('Assignment successful');
                 // Reload the page to show updated assignments
                 window.location.reload();
             } else {
-                console.error('Assignment failed:', result.error);
                 assignmentError = result.error;
             }
         } catch (error) {
-            console.error('Error assigning zookeeper:', error);
             assignmentError = 'Failed to assign zookeeper. Please try again.';
         }
     }

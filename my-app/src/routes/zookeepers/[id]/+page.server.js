@@ -4,7 +4,6 @@ import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
     try {
-        console.log('Loading zookeeper details for ID:', params.id);
         const zookeeper = await getZookeeper(params.id);
         
         if (!zookeeper) {
@@ -19,7 +18,6 @@ export async function load({ params }) {
             try {
                 // Get the specific animal directly instead of fetching all animals
                 assignedAnimal = await getAnimal(zookeeper.animal_id);
-                console.log('Found assigned animal:', assignedAnimal);
             } catch (err) {
                 console.error('Error loading assigned animal:', err);
                 // Continue without the animal data

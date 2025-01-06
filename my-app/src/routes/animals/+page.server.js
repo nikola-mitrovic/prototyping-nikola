@@ -3,10 +3,7 @@ import { error } from '@sveltejs/kit';
 
 export async function load() {
     try {
-        console.log('Loading animals page...');
         const animals = await getAnimals();
-        console.log('Loaded animals:', animals);
-
         return {
             animals
         };

@@ -7,14 +7,8 @@
 
     function handleSubmit() {
         return async ({ result }) => {
-            console.log('Form submission result:', result);
             if (result.type === 'success') {
-                console.log('Form submission successful');
                 await goto('/zookeepers');
-            } else if (result.type === 'failure') {
-                console.error('Form submission failed:', result.data);
-            } else {
-                console.log('Unknown result type:', result);
             }
         };
     }

@@ -4,7 +4,6 @@ import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
     try {
-        console.log('Loading animal details for ID:', params.id);
         const animal = await getAnimal(params.id);
         
         if (!animal) {
@@ -17,22 +16,19 @@ export async function load({ params }) {
         let allZookeepers = [];
         let assignedZookeepers = [];
         let availableZookeepers = [];
-        
+
         try {
             allZookeepers = await getZookeepers();
-            console.log('Found all zookeepers:', allZookeepers);
             
             // Filter to find assigned zookeepers (using numeric id)
-            assignedZookeepers = allZookeepers.filter(keeper => 
+            assignedZookeepers = allZookeepers.filter(keeper =>
                 keeper.animal_id === animal.id
             );
-            console.log('Found assigned zookeepers:', assignedZookeepers);
             
             // Filter to find available zookeepers (not assigned to any animal)
-            availableZookeepers = allZookeepers.filter(keeper => 
+            availableZookeepers = allZookeepers.filter(keeper =>
                 !keeper.animal_id || keeper.animal_id === undefined
             );
-            console.log('Found available zookeepers:', availableZookeepers);
 
             return {
                 animal,
