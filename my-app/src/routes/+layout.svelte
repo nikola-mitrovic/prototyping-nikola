@@ -8,7 +8,7 @@
   data-bs-theme="dark"
 >
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">ScreenStack</a>
+    <a class="navbar-brand" href="/">ZooKeeper</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -23,12 +23,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/movies"
-            >Movies</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/animals">Animals</a>
+          <a class="nav-link active" aria-current="page" href="/animals">Animals</a>
         </li>
       </ul>
     </div>

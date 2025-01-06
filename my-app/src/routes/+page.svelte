@@ -1,2 +1,6 @@
-<h1>Welcome to ScreenStack</h1>
-<p>Your tracker and search engine for movies and tv shows</p>
+<h1>Welcome to ZooKeeper</h1>
+<p>Manage your zoo animals with ease</p>
+
+<div class="mt-4">
+    <a href="/animals" class="btn btn-primary">View Animals</a>
+</div>
