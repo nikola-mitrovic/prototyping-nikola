@@ -1,4 +1,4 @@
-import db from '$lib/db.js';
+import { createZookeeper } from '$lib/db.js';
 import { fail } from '@sveltejs/kit';
 
 export const actions = {
@@ -28,8 +28,12 @@ export const actions = {
                 });
             }
 
+            // Convert date from YYYY-MM-DD to DD.MM.YYYY
+            const [year, month, day] = zookeeper.hire_date.split('-');
+            zookeeper.hire_date = `${day}.${month}.${year}`;
+
             // Create the zookeeper
-            const id = await db.createZookeeper(zookeeper);
+            const id = await createZookeeper(zookeeper);
             
             if (id) {
                 // Redirect to zookeepers list on success

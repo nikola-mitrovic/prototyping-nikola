@@ -1,4 +1,4 @@
-import db from '$lib/db.js';
+import { createAnimal } from '$lib/db.js';
 import { fail } from '@sveltejs/kit';
 
 export const actions = {
@@ -25,8 +25,12 @@ export const actions = {
                 });
             }
 
+            // Convert date from YYYY-MM-DD to DD.MM.YYYY
+            const [year, month, day] = animal.arrival_date.split('-');
+            animal.arrival_date = `${day}.${month}.${year}`;
+
             // Create the animal
-            const id = await db.createAnimal(animal);
+            const id = await createAnimal(animal);
             
             if (id) {
                 // Redirect to animals list on success
