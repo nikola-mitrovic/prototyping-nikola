@@ -4,7 +4,98 @@ import { DB_URI } from "$env/static/private";
 const client = new MongoClient(DB_URI);
 
 await client.connect();
-const db = client.db("ScreenStackDB"); // select database
+const db = client.db("zooDB"); // Changed to zooDB
+
+//////////////////////////////////////////
+// Animals
+//////////////////////////////////////////
+
+// Get all animals
+async function getAnimals() {
+  let animals = [];
+  try {
+    const collection = db.collection("animals");
+    const query = {};
+    animals = await collection.find(query).toArray();
+    animals.forEach((animal) => {
+      animal._id = animal._id.toString();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return animals;
+}
+
+// Get animal by id
+async function getAnimal(id) {
+  let animal = null;
+  try {
+    const collection = db.collection("animals");
+    const query = { _id: new ObjectId(id) };
+    animal = await collection.findOne(query);
+    if (!animal) {
+      console.log("No animal with id " + id);
+    } else {
+      animal._id = animal._id.toString();
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+  return animal;
+}
+
+// create animal
+async function createAnimal(animal) {
+  animal.image = "/images/placeholder.jpg"; // default image
+  try {
+    const collection = db.collection("animals");
+    const result = await collection.insertOne(animal);
+    return result.insertedId.toString();
+  } catch (error) {
+    console.log(error.message);
+  }
+  return null;
+}
+
+// update animal
+async function updateAnimal(animal) {
+  try {
+    let id = animal._id;
+    delete animal._id; // delete the _id from the object, because the _id cannot be updated
+    const collection = db.collection("animals");
+    const query = { _id: new ObjectId(id) };
+    const result = await collection.updateOne(query, { $set: animal });
+
+    if (result.matchedCount === 0) {
+      console.log("No animal with id " + id);
+    } else {
+      console.log("Animal with id " + id + " has been updated.");
+      return id;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+  return null;
+}
+
+// delete animal by id
+async function deleteAnimal(id) {
+  try {
+    const collection = db.collection("animals");
+    const query = { _id: new ObjectId(id) };
+    const result = await collection.deleteOne(query);
+
+    if (result.deletedCount === 0) {
+      console.log("No animal with id " + id);
+    } else {
+      console.log("Animal with id " + id + " has been successfully deleted.");
+      return id;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+  return null;
+}
 
 //////////////////////////////////////////
 // Movies
@@ -138,8 +229,15 @@ async function deleteMovie(id) {
   return null;
 }
 
-// export all functions so that they can be used in other files
+// Export both sets of functions during transition
 export default {
+  // New animal functions
+  getAnimals,
+  getAnimal,
+  createAnimal,
+  updateAnimal,
+  deleteAnimal,
+  // Keep existing movie functions
   getMovies,
   getMovie,
   createMovie,
