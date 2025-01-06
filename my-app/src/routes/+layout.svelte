@@ -27,6 +27,9 @@
             >Movies</a
           >
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/animals">Animals</a>
+        </li>
       </ul>
     </div>
   </div>
