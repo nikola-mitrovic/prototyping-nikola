@@ -14,18 +14,16 @@
             {#each data.animals as animal}
                 <div class="col">
                     <div class="card h-100">
-                        <img src={animal.image} class="card-img-top" alt={animal.name}>
                         <div class="card-body">
                             <h5 class="card-title">{animal.nickname}</h5>
                             <p class="card-text">
                                 <strong>Species:</strong> {animal.name}<br>
                                 <strong>Age:</strong> {animal.age} years<br>
                                 <strong>Diet:</strong> {animal.diet}<br>
-                                <strong>Gender:</strong> {animal.gender}
+                                <strong>Gender:</strong> {animal.gender}<br>
+                                <strong>Arrived:</strong> {animal.arrival_date}
                             </p>
-                            <p class="card-text">
-                                <small class="text-muted">Arrived: {animal.arrival_date}</small>
-                            </p>
+                            <a href="/animals/{animal._id}" class="btn btn-primary btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -33,7 +31,7 @@
         </div>
     {:else}
         <div class="alert alert-info">
-            No animals in the zoo yet. Add some animals to get started!
+            No animals found. Add some animals to get started!
         </div>
     {/if}
 </div> 

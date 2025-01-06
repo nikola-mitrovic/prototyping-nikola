@@ -21,6 +21,7 @@
                                 <strong>Hire Date:</strong> {keeper.hire_date}<br>
                                 <strong>Assigned Animal ID:</strong> {keeper.animal_id || 'None assigned'}
                             </p>
+                            <a href="/zookeepers/{keeper._id}" class="btn btn-primary btn-sm">View Details</a>
                         </div>
                     </div>
                 </div>
