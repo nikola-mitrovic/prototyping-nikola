@@ -78,6 +78,31 @@ export async function getAnimal(id) {
     return animal;
 }
 
+// Get highest animal ID
+async function getHighestAnimalId() {
+    try {
+        if (!db) {
+            console.log('DB: Reconnecting to database...');
+            await initDb();
+        }
+        const collection = db.collection("animals");
+        const animals = await collection.find({}).toArray();
+        
+        if (!animals || animals.length === 0) {
+            console.log('DB: No existing animals, starting with ID 1');
+            return 0;
+        }
+        
+        // Find highest id, accounting for animals that might not have an id
+        const highestId = Math.max(...animals.map(animal => animal.id || 0));
+        console.log('DB: Current highest animal ID:', highestId);
+        return highestId;
+    } catch (error) {
+        console.error('DB: Error getting highest animal ID:', error);
+        throw error;
+    }
+}
+
 // create animal
 export async function createAnimal(animal) {
     try {
@@ -85,6 +110,12 @@ export async function createAnimal(animal) {
             console.log('DB: Reconnecting to database...');
             await initDb();
         }
+        
+        // Get and assign next available ID
+        const highestId = await getHighestAnimalId();
+        animal.id = highestId + 1;
+        console.log('DB: Assigning new animal ID:', animal.id);
+        
         console.log('DB: Creating new animal:', animal);
         animal.image = "/images/placeholder.jpg"; // default image
         const collection = db.collection("animals");

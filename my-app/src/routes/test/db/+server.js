@@ -13,61 +13,41 @@
  * Status: Keep for reference and future testing
  */
 
-import { getAnimals, createAnimal, getAnimal, updateAnimal } from '$lib/db.js';
+import { createAnimal, getAnimals } from '$lib/db.js';
 import { json } from '@sveltejs/kit';
 
 export async function GET() {
     try {
-        console.log('TEST: Starting database test');
-        
-        // 1. Get all animals first
-        console.log('TEST: Getting all animals');
-        const allAnimals = await getAnimals();
-        console.log('TEST: Current animals:', allAnimals);
+        // First get all animals to see current state
+        console.log('TEST: Getting all current animals');
+        const currentAnimals = await getAnimals();
+        console.log('TEST: Current animals:', currentAnimals);
 
-        // 2. Create a test animal
+        // Create a test animal
         const testAnimal = {
             name: "Test Lion",
-            nickname: "Testy",
+            nickname: "Leo",
             age: 5,
             gender: "Male",
             diet: "carnivore",
-            arrival_date: "01.01.2024"
+            arrival_date: "01.02.2024"
         };
+
         console.log('TEST: Creating test animal');
         const newId = await createAnimal(testAnimal);
-        console.log('TEST: Created animal with ID:', newId);
-
-        // 3. Get the created animal
-        console.log('TEST: Getting created animal');
-        const createdAnimal = await getAnimal(newId);
-        console.log('TEST: Retrieved animal:', createdAnimal);
-
-        // 4. Update the animal
-        const updates = {
-            nickname: "Updated Testy",
-            age: 6
-        };
-        console.log('TEST: Updating animal');
-        await updateAnimal(newId, updates);
-
-        // 5. Get updated animal
-        console.log('TEST: Getting updated animal');
-        const updatedAnimal = await getAnimal(newId);
-        console.log('TEST: Updated animal:', updatedAnimal);
-
+        
+        // Get animals again to verify ID assignment
+        console.log('TEST: Getting updated animals list');
+        const updatedAnimals = await getAnimals();
+        
         return json({
-            success: true,
-            message: 'Database test completed successfully',
-            initialAnimals: allAnimals,
-            createdAnimal: createdAnimal,
-            updatedAnimal: updatedAnimal
+            message: 'Test completed',
+            newAnimalId: newId,
+            currentAnimals: currentAnimals,
+            updatedAnimals: updatedAnimals
         });
-    } catch (err) {
-        console.error('TEST: Error during database test:', err);
-        return json({
-            success: false,
-            error: err.message
-        }, { status: 500 });
+    } catch (error) {
+        console.error('TEST: Error during test:', error);
+        return json({ error: error.message }, { status: 500 });
     }
 } 
