@@ -5,22 +5,22 @@
     const { animal, assignedZookeepers, availableZookeepers, zookeeperError } = data;
 
     let showModal = false;
-    let selectedKeeperId = '';
+    let selectedZookeeperId = '';
     let assignmentError = '';
 
     // Add debug logging
     console.log('Available zookeepers:', availableZookeepers);
     console.log('Button should be disabled:', !availableZookeepers || availableZookeepers.length === 0);
 
-    async function handleAssignKeeper() {
-        console.log('Assigning keeper:', selectedKeeperId, 'to animal:', animal._id);
+    async function handleAssignZookeeper() {
+        console.log('Assigning zookeeper:', selectedZookeeperId, 'to animal:', animal._id);
         try {
-            const response = await fetch(`/animals/${animal._id}/assign-keeper`, {
+            const response = await fetch(`/animals/${animal._id}/assign-zookeeper`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ keeper_id: selectedKeeperId })
+                body: JSON.stringify({ zookeeper_id: selectedZookeeperId })
             });
 
             const result = await response.json();
@@ -34,20 +34,20 @@
                 assignmentError = result.error;
             }
         } catch (error) {
-            console.error('Error assigning keeper:', error);
-            assignmentError = 'Failed to assign keeper. Please try again.';
+            console.error('Error assigning zookeeper:', error);
+            assignmentError = 'Failed to assign zookeeper. Please try again.';
         }
     }
 
-    async function handleRemoveKeeper(keeperId) {
-        console.log('Removing keeper:', keeperId, 'from animal:', animal._id);
+    async function handleRemoveZookeeper(zookeeperId) {
+        console.log('Removing zookeeper:', zookeeperId, 'from animal:', animal._id);
         try {
-            const response = await fetch(`/animals/${animal._id}/remove-keeper`, {
+            const response = await fetch(`/animals/${animal._id}/remove-zookeeper`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ keeper_id: keeperId })
+                body: JSON.stringify({ zookeeper_id: zookeeperId })
             });
 
             const result = await response.json();
@@ -60,9 +60,13 @@
                 assignmentError = result.error;
             }
         } catch (error) {
-            console.error('Error removing keeper:', error);
-            assignmentError = 'Failed to remove keeper. Please try again.';
+            console.error('Error removing zookeeper:', error);
+            assignmentError = 'Failed to remove zookeeper. Please try again.';
         }
+    }
+
+    function handleSelectZookeeper(event) {
+        selectedZookeeperId = event.target.value;
     }
 </script>
 
@@ -176,31 +180,31 @@
                             on:click={() => showModal = true}
                             disabled={!availableZookeepers || availableZookeepers.length === 0}
                             aria-label="Add new zookeeper">
-                        <i class="bi bi-person-plus-fill"></i> Add Keeper
+                        <i class="bi bi-person-plus-fill"></i> Add Zookeeper
                     </button>
                 </div>
                 <div class="card-body">
                     {#if assignedZookeepers && assignedZookeepers.length > 0}
                         <div class="row g-3">
-                            {#each assignedZookeepers as keeper}
+                            {#each assignedZookeepers as zookeeper}
                                 <div class="col-12">
                                     <div class="border rounded p-3">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="mb-1">{keeper.first_name} {keeper.last_name}</h6>
+                                                <h6 class="mb-1">{zookeeper.first_name} {zookeeper.last_name}</h6>
                                                 <p class="text-muted mb-0">
                                                     <small>
-                                                        {keeper.gender} • Hired: {keeper.hire_date}
+                                                        {zookeeper.gender} • Hired: {zookeeper.hire_date}
                                                     </small>
                                                 </p>
                                             </div>
                                             <div>
                                                 <button class="btn btn-danger btn-sm me-2" 
-                                                        on:click={() => handleRemoveKeeper(keeper._id)}
-                                                        aria-label="Remove keeper">
+                                                        on:click={() => handleRemoveZookeeper(zookeeper._id)}
+                                                        aria-label="Remove zookeeper">
                                                     <i class="bi bi-x-circle"></i>
                                                 </button>
-                                                <a href="/zookeepers/{keeper._id}" class="btn btn-primary btn-sm">
+                                                <a href="/zookeepers/{zookeeper._id}" class="btn btn-primary btn-sm">
                                                     <i class="bi bi-person-badge"></i> View Details
                                                 </a>
                                             </div>
@@ -216,7 +220,7 @@
                                     on:click={() => showModal = true}
                                     disabled={!availableZookeepers || availableZookeepers.length === 0}
                                     aria-label="Assign first zookeeper">
-                                <i class="bi bi-person-plus-fill"></i> Assign First Keeper
+                                <i class="bi bi-person-plus-fill"></i> Assign First Zookeeper
                             </button>
                         </div>
                     {/if}
@@ -226,13 +230,13 @@
     </div>
 </div>
 
-<!-- Add Keeper Modal -->
+<!-- Add Zookeeper Modal -->
 {#if showModal}
     <div class="modal show d-block" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Assign Keeper to {animal.nickname}</h5>
+                    <h5 class="modal-title">Assign Zookeeper to {animal.nickname}</h5>
                     <button type="button" class="btn-close" on:click={() => showModal = false} aria-label="Close modal"></button>
                 </div>
                 <div class="modal-body">
@@ -248,12 +252,12 @@
                         </div>
                     {:else}
                         <div class="mb-3">
-                            <label for="keeper" class="form-label">Select Keeper</label>
-                            <select class="form-select" bind:value={selectedKeeperId}>
-                                <option value="">Choose a keeper...</option>
-                                {#each availableZookeepers as keeper}
-                                    <option value={keeper._id}>
-                                        {keeper.first_name} {keeper.last_name} ({keeper.gender})
+                            <label for="zookeeper" class="form-label">Select Zookeeper</label>
+                            <select id="zookeeper" class="form-select" on:change={handleSelectZookeeper}>
+                                <option value="">Choose a zookeeper...</option>
+                                {#each availableZookeepers as zookeeper}
+                                    <option value={zookeeper._id}>
+                                        {zookeeper.first_name} {zookeeper.last_name} ({zookeeper.gender})
                                     </option>
                                 {/each}
                             </select>
@@ -261,13 +265,12 @@
                     {/if}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" on:click={() => showModal = false}>
-                        Cancel
-                    </button>
-                    <button type="button" class="btn btn-primary" 
-                            disabled={!selectedKeeperId}
-                            on:click={handleAssignKeeper}>
-                        Assign Keeper
+                    <button type="button" class="btn btn-secondary" on:click={() => showModal = false}>Cancel</button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            disabled={!selectedZookeeperId}
+                            on:click={handleAssignZookeeper}>
+                        Assign Zookeeper
                     </button>
                 </div>
             </div>

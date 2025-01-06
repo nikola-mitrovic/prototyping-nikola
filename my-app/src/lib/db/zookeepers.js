@@ -10,8 +10,8 @@ export async function getZookeepers() {
         zookeepers = await collection.find(query).toArray();
         console.log('DB: Found', zookeepers.length, 'zookeepers');
         
-        zookeepers.forEach((keeper) => {
-            keeper._id = keeper._id.toString();
+        zookeepers.forEach((zookeeper) => {
+            zookeeper._id = zookeeper._id.toString();
         });
         console.log('DB: Processed zookeepers:', zookeepers);
     } catch (error) {
@@ -25,12 +25,12 @@ export async function getZookeeper(id) {
     try {
         console.log('DB: Getting zookeeper with ID:', id);
         const collection = await getCollection("zookeepers");
-        const keeper = await collection.findOne({ _id: new ObjectId(id) });
-        if (keeper) {
-            keeper._id = keeper._id.toString();
+        const zookeeper = await collection.findOne({ _id: new ObjectId(id) });
+        if (zookeeper) {
+            zookeeper._id = zookeeper._id.toString();
         }
-        console.log('DB: Found zookeeper:', keeper);
-        return keeper;
+        console.log('DB: Found zookeeper:', zookeeper);
+        return zookeeper;
     } catch (error) {
         console.error('DB: Error getting zookeeper:', error);
         throw error;
@@ -47,7 +47,7 @@ async function getHighestZookeeperId() {
             return 0;
         }
         
-        const highestId = Math.max(...zookeepers.map(keeper => keeper.id || 0));
+        const highestId = Math.max(...zookeepers.map(zookeeper => zookeeper.id || 0));
         console.log('DB: Current highest zookeeper ID:', highestId);
         return highestId;
     } catch (error) {
@@ -73,21 +73,21 @@ export async function createZookeeper(zookeeper) {
     }
 }
 
-export async function assignKeeperToAnimal(animalId, keeperId) {
+export async function assignZookeeperToAnimal(animalId, zookeeperId) {
     try {
-        console.log(`DB: Attempting to assign keeper ${keeperId} to animal ${animalId}`);
+        console.log(`DB: Attempting to assign zookeeper ${zookeeperId} to animal ${animalId}`);
         
-        // First verify both animal and keeper exist
+        // First verify both animal and zookeeper exist
         const animal = await getAnimal(animalId);
-        const keeper = await getZookeeper(keeperId);
+        const zookeeper = await getZookeeper(zookeeperId);
         
         if (!animal) {
             console.error('DB: Animal not found');
             throw new Error('Animal not found');
         }
-        if (!keeper) {
-            console.error('DB: Keeper not found');
-            throw new Error('Keeper not found');
+        if (!zookeeper) {
+            console.error('DB: Zookeeper not found');
+            throw new Error('Zookeeper not found');
         }
 
         // Make sure the animal has a numeric ID
@@ -97,26 +97,26 @@ export async function assignKeeperToAnimal(animalId, keeperId) {
         }
         
         console.log('DB: Found animal:', animal);
-        console.log('DB: Found keeper:', keeper);
+        console.log('DB: Found zookeeper:', zookeeper);
         
-        // Update the keeper's animal_id
+        // Update the zookeeper's animal_id
         const collection = await getCollection("zookeepers");
         const result = await collection.updateOne(
-            { _id: new ObjectId(keeperId) },
+            { _id: new ObjectId(zookeeperId) },
             { $set: { animal_id: animal.id } }
         );
         
         console.log('DB: Assignment result:', result);
         
         if (result.modifiedCount === 0) {
-            console.log('DB: No keeper was updated');
-            throw new Error('Failed to update keeper');
+            console.log('DB: No zookeeper was updated');
+            throw new Error('Failed to update zookeeper');
         }
         
-        console.log('DB: Successfully assigned keeper to animal');
+        console.log('DB: Successfully assigned zookeeper to animal');
         return true;
     } catch (error) {
-        console.error('DB: Error assigning keeper to animal:', error);
+        console.error('DB: Error assigning zookeeper to animal:', error);
         throw error;
     }
 }
