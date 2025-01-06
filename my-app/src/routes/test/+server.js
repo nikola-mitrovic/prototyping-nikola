@@ -1,3 +1,20 @@
+/**
+ * TEST ENDPOINT - General API Testing
+ * 
+ * This endpoint was created during development to test the database API layer.
+ * It provides a more structured test output compared to the db/+server.js endpoint.
+ * 
+ * Tests:
+ * 1. getAnimals() - Retrieves all animals
+ * 2. createAnimal() - Creates a test animal
+ * 3. getAnimal() - Retrieves specific animal
+ * 4. updateAnimal() - Updates animal data
+ * 5. deleteAnimal() - Removes test animal
+ * 
+ * To use: Visit /test in your browser
+ * Status: Keep for API testing and verification
+ */
+
 import db from '$lib/db.js';
 import { json } from '@sveltejs/kit';
 

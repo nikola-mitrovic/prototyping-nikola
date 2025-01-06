@@ -1,3 +1,20 @@
+/**
+ * TEST FILE - Direct Database Testing
+ * 
+ * This is a standalone test script created during initial development
+ * to test database functions directly using Node.js.
+ * Note: This file uses require() instead of import statements
+ * and needs to be run directly with Node.js.
+ * 
+ * Tests:
+ * 1. Database connection
+ * 2. CRUD operations for animals
+ * 3. Error handling
+ * 
+ * To run: node test-db.js
+ * Status: Keep for reference and direct database testing
+ */
+
 const { MongoClient, ObjectId } = require("mongodb");
 require('dotenv').config(); // Load environment variables
 

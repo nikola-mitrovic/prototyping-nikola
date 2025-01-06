@@ -30,9 +30,9 @@
                 <p class="text-muted mb-0">{animal.name}</p>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" disabled>
+                <a href="/animals/{animal._id}/edit" class="btn btn-outline-primary">
                     <i class="bi bi-pencil"></i> Edit Animal
-                </button>
+                </a>
                 <a href="/animals" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Back to Animals
                 </a>

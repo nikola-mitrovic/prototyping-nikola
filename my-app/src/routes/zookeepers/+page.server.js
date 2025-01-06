@@ -1,15 +1,19 @@
-import db from '$lib/db.js';
+import { getZookeepers } from '$lib/db.js';
+import { error } from '@sveltejs/kit';
 
 export async function load() {
     try {
-        const zookeepers = await db.getZookeepers();
+        console.log('Loading zookeepers page...');
+        const zookeepers = await getZookeepers();
+        console.log('Loaded zookeepers:', zookeepers);
+
         return {
             zookeepers
         };
-    } catch (error) {
-        console.error('Error loading zookeepers:', error);
-        return {
-            zookeepers: []
-        };
+    } catch (err) {
+        console.error('Error loading zookeepers:', err);
+        throw error(500, {
+            message: 'Failed to load zookeepers'
+        });
     }
 } 
