@@ -229,18 +229,66 @@ async function deleteMovie(id) {
   return null;
 }
 
-// Export both sets of functions during transition
+//////////////////////////////////////////
+// Zookeepers
+//////////////////////////////////////////
+
+// Get all zookeepers
+async function getZookeepers() {
+    let zookeepers = [];
+    try {
+        const collection = db.collection("zookeepers");
+        const query = {};
+        zookeepers = await collection.find(query).toArray();
+        zookeepers.forEach((keeper) => {
+            keeper._id = keeper._id.toString();
+        });
+    } catch (error) {
+        console.log(error);
+    }
+    return zookeepers;
+}
+
+// Get zookeeper by id
+async function getZookeeper(id) {
+    let zookeeper = null;
+    try {
+        const collection = db.collection("zookeepers");
+        const query = { _id: new ObjectId(id) };
+        zookeeper = await collection.findOne(query);
+        if (!zookeeper) {
+            console.log("No zookeeper with id " + id);
+        } else {
+            zookeeper._id = zookeeper._id.toString();
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+    return zookeeper;
+}
+
+// create zookeeper
+async function createZookeeper(zookeeper) {
+    try {
+        const collection = db.collection("zookeepers");
+        const result = await collection.insertOne(zookeeper);
+        return result.insertedId.toString();
+    } catch (error) {
+        console.log(error.message);
+    }
+    return null;
+}
+
+// Export both sets of functions
 export default {
-  // New animal functions
-  getAnimals,
-  getAnimal,
-  createAnimal,
-  updateAnimal,
-  deleteAnimal,
-  // Keep existing movie functions
-  getMovies,
-  getMovie,
-  createMovie,
-  updateMovie,
-  deleteMovie,
+    // Animal functions
+    getAnimals,
+    getAnimal,
+    createAnimal,
+    updateAnimal,
+    deleteAnimal,
+    // Zookeeper functions
+    getZookeepers,
+    getZookeeper,
+    createZookeeper
 };
