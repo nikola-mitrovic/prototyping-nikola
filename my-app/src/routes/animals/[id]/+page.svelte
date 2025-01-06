@@ -2,7 +2,42 @@
 <script>
     import { page } from '$app/stores';
     export let data;
-    const { animal, assignedZookeepers, zookeeperError } = data;
+    const { animal, assignedZookeepers, availableZookeepers, zookeeperError } = data;
+
+    let showModal = false;
+    let selectedKeeperId = '';
+    let assignmentError = '';
+
+    // Add debug logging
+    console.log('Available zookeepers:', availableZookeepers);
+    console.log('Button should be disabled:', !availableZookeepers || availableZookeepers.length === 0);
+
+    async function handleAssignKeeper() {
+        console.log('Assigning keeper:', selectedKeeperId, 'to animal:', animal._id);
+        try {
+            const response = await fetch(`/animals/${animal._id}/assign-keeper`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ keeper_id: selectedKeeperId })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                console.log('Assignment successful');
+                // Reload the page to show updated assignments
+                window.location.reload();
+            } else {
+                console.error('Assignment failed:', result.error);
+                assignmentError = result.error;
+            }
+        } catch (error) {
+            console.error('Error assigning keeper:', error);
+            assignmentError = 'Failed to assign keeper. Please try again.';
+        }
+    }
 </script>
 
 <div class="container mt-4">
@@ -111,7 +146,10 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Assigned Zookeepers</h5>
-                    <button class="btn btn-outline-primary btn-sm" disabled>
+                    <button class="btn btn-outline-primary btn-sm" 
+                            on:click={() => showModal = true}
+                            disabled={!availableZookeepers || availableZookeepers.length === 0}
+                            aria-label="Add new zookeeper">
                         <i class="bi bi-person-plus-fill"></i> Add Keeper
                     </button>
                 </div>
@@ -143,7 +181,10 @@
                     {:else}
                         <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center">
                             <span>No zookeepers currently assigned to this animal.</span>
-                            <button class="btn btn-outline-primary btn-sm" disabled>
+                            <button class="btn btn-outline-primary btn-sm" 
+                                    on:click={() => showModal = true}
+                                    disabled={!availableZookeepers || availableZookeepers.length === 0}
+                                    aria-label="Assign first zookeeper">
                                 <i class="bi bi-person-plus-fill"></i> Assign First Keeper
                             </button>
                         </div>
@@ -154,7 +195,62 @@
     </div>
 </div>
 
+<!-- Add Keeper Modal -->
+{#if showModal}
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Keeper to {animal.nickname}</h5>
+                    <button type="button" class="btn-close" on:click={() => showModal = false} aria-label="Close modal"></button>
+                </div>
+                <div class="modal-body">
+                    {#if assignmentError}
+                        <div class="alert alert-danger">
+                            {assignmentError}
+                        </div>
+                    {/if}
+                    
+                    {#if availableZookeepers.length === 0}
+                        <div class="alert alert-info">
+                            No available zookeepers. All zookeepers are currently assigned to animals.
+                        </div>
+                    {:else}
+                        <div class="mb-3">
+                            <label for="keeper" class="form-label">Select Keeper</label>
+                            <select class="form-select" bind:value={selectedKeeperId}>
+                                <option value="">Choose a keeper...</option>
+                                {#each availableZookeepers as keeper}
+                                    <option value={keeper._id}>
+                                        {keeper.first_name} {keeper.last_name} ({keeper.gender})
+                                    </option>
+                                {/each}
+                            </select>
+                        </div>
+                    {/if}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" on:click={() => showModal = false}>
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" 
+                            disabled={!selectedKeeperId}
+                            on:click={handleAssignKeeper}>
+                        Assign Keeper
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/if}
+
 <!-- Add Bootstrap Icons -->
 <svelte:head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</svelte:head> 
+</svelte:head>
+
+<style>
+    :global(.modal.show) {
+        background-color: rgba(0,0,0,0.5);
+    }
+</style> 

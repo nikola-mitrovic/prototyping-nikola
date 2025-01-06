@@ -12,34 +12,42 @@ export async function load({ params }) {
             });
         }
 
-        // Find all zookeepers assigned to this animal
+        // Get all zookeepers to show in the assignment modal
+        let allZookeepers = [];
         let assignedZookeepers = [];
+        let availableZookeepers = [];
+        
         try {
-            const zookeepers = await getZookeepers();
-            // Get the numeric ID from the animal
-            const animalNumericId = animal.id;
-            // Find all zookeepers assigned to this animal
-            assignedZookeepers = zookeepers.filter(keeper => 
-                keeper.animal_id === animalNumericId
+            allZookeepers = await getZookeepers();
+            console.log('Found all zookeepers:', allZookeepers);
+            
+            // Filter to find assigned zookeepers (using numeric id)
+            assignedZookeepers = allZookeepers.filter(keeper => 
+                keeper.animal_id === animal.id
             );
-
-            console.log('Animal numeric ID:', animalNumericId);
             console.log('Found assigned zookeepers:', assignedZookeepers);
+            
+            // Filter to find available zookeepers (not assigned to any animal)
+            availableZookeepers = allZookeepers.filter(keeper => 
+                !keeper.animal_id || keeper.animal_id === undefined
+            );
+            console.log('Found available zookeepers:', availableZookeepers);
+
+            return {
+                animal,
+                assignedZookeepers,
+                availableZookeepers,
+                zookeeperError: false
+            };
         } catch (err) {
-            console.error('Error loading assigned zookeepers:', err);
+            console.error('Error loading zookeepers:', err);
             return {
                 animal,
                 assignedZookeepers: [],
+                availableZookeepers: [],
                 zookeeperError: true
             };
         }
-
-        console.log('Loaded animal details:', animal);
-        return {
-            animal,
-            assignedZookeepers,
-            zookeeperError: false
-        };
     } catch (err) {
         console.error('Error loading animal:', err);
         throw error(500, {

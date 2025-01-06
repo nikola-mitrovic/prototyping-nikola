@@ -336,33 +336,131 @@ export async function getZookeepers() {
 }
 
 // Get zookeeper by id
-async function getZookeeper(id) {
+export async function getZookeeper(id) {
     let zookeeper = null;
     try {
+        if (!db) {
+            console.log('DB: Reconnecting to database...');
+            await initDb();
+        }
+        console.log('DB: Getting zookeeper with ID:', id);
         const collection = db.collection("zookeepers");
         const query = { _id: new ObjectId(id) };
         zookeeper = await collection.findOne(query);
         if (!zookeeper) {
-            console.log("No zookeeper with id " + id);
+            console.log("DB: No zookeeper with id " + id);
         } else {
             zookeeper._id = zookeeper._id.toString();
+            console.log('DB: Found zookeeper:', zookeeper);
         }
     } catch (error) {
-        console.log(error.message);
+        console.error('DB: Error getting zookeeper:', error);
+        throw error;
     }
     return zookeeper;
 }
 
-// create zookeeper
-async function createZookeeper(zookeeper) {
+// Get highest zookeeper ID
+async function getHighestZookeeperId() {
     try {
+        if (!db) {
+            console.log('DB: Reconnecting to database...');
+            await initDb();
+        }
+        const collection = db.collection("zookeepers");
+        const zookeepers = await collection.find({}).toArray();
+        
+        if (!zookeepers || zookeepers.length === 0) {
+            console.log('DB: No existing zookeepers, starting with ID 1');
+            return 0;
+        }
+        
+        // Find highest id, accounting for zookeepers that might not have an id
+        const highestId = Math.max(...zookeepers.map(keeper => keeper.id || 0));
+        console.log('DB: Current highest zookeeper ID:', highestId);
+        return highestId;
+    } catch (error) {
+        console.error('DB: Error getting highest zookeeper ID:', error);
+        throw error;
+    }
+}
+
+// create zookeeper
+export async function createZookeeper(zookeeper) {
+    try {
+        if (!db) {
+            console.log('DB: Reconnecting to database...');
+            await initDb();
+        }
+        
+        // Get and assign next available ID
+        const highestId = await getHighestZookeeperId();
+        zookeeper.id = highestId + 1;
+        console.log('DB: Assigning new zookeeper ID:', zookeeper.id);
+        
+        console.log('DB: Creating new zookeeper:', zookeeper);
         const collection = db.collection("zookeepers");
         const result = await collection.insertOne(zookeeper);
+        console.log('DB: Created zookeeper with ID:', result.insertedId);
         return result.insertedId.toString();
     } catch (error) {
-        console.log(error.message);
+        console.error('DB: Error creating zookeeper:', error);
+        throw error;
     }
-    return null;
+}
+
+// Assign keeper to animal
+export async function assignKeeperToAnimal(animalId, keeperId) {
+    try {
+        if (!db) {
+            console.log('DB: Reconnecting to database...');
+            await initDb();
+        }
+        
+        console.log(`DB: Attempting to assign keeper ${keeperId} to animal ${animalId}`);
+        
+        // First verify both animal and keeper exist
+        const animal = await getAnimal(animalId);
+        const keeper = await getZookeeper(keeperId);
+        
+        if (!animal) {
+            console.error('DB: Animal not found');
+            throw new Error('Animal not found');
+        }
+        if (!keeper) {
+            console.error('DB: Keeper not found');
+            throw new Error('Keeper not found');
+        }
+
+        // Make sure the animal has a numeric ID
+        if (!animal.id) {
+            console.error('DB: Animal does not have a numeric ID');
+            throw new Error('Animal does not have a valid ID');
+        }
+        
+        console.log('DB: Found animal:', animal);
+        console.log('DB: Found keeper:', keeper);
+        
+        // Update the keeper's animal_id
+        const collection = db.collection("zookeepers");
+        const result = await collection.updateOne(
+            { _id: new ObjectId(keeperId) },
+            { $set: { animal_id: animal.id } } // Use the numeric id
+        );
+        
+        console.log('DB: Assignment result:', result);
+        
+        if (result.modifiedCount === 0) {
+            console.log('DB: No keeper was updated');
+            throw new Error('Failed to update keeper');
+        }
+        
+        console.log('DB: Successfully assigned keeper to animal');
+        return true;
+    } catch (error) {
+        console.error('DB: Error assigning keeper to animal:', error);
+        throw error;
+    }
 }
 
 // Export both sets of functions
@@ -376,5 +474,6 @@ export {
     // Zookeeper functions
     getZookeepers,
     getZookeeper,
-    createZookeeper
+    createZookeeper,
+    assignKeeperToAnimal
 };
