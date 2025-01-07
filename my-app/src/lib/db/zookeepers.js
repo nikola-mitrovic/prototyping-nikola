@@ -13,7 +13,7 @@ export async function getZookeepers() {
         zookeepers.forEach((zookeeper) => {
             zookeeper._id = zookeeper._id.toString();
         });
-        console.log('DB: Processed zookeepers:', zookeepers);
+        return zookeepers;
     } catch (error) {
         console.error('DB: Error getting zookeepers:', error);
         throw error;
@@ -48,7 +48,6 @@ async function getHighestZookeeperId() {
         }
         
         const highestId = Math.max(...zookeepers.map(zookeeper => zookeeper.id || 0));
-        console.log('DB: Current highest zookeeper ID:', highestId);
         return highestId;
     } catch (error) {
         console.error('DB: Error getting highest zookeeper ID:', error);
