@@ -35,7 +35,6 @@ export const actions = {
             // Convert date from YYYY-MM-DD to DD.MM.YYYY
             const [year, month, day] = zookeeper.hire_date.split('-');
             zookeeper.hire_date = `${day}.${month}.${year}`;
-            console.log('Converted hire date:', zookeeper.hire_date);
 
             // Create the zookeeper
             console.log('Attempting to create zookeeper:', zookeeper);

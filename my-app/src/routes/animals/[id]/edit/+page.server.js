@@ -45,7 +45,6 @@ export const actions = {
             // Convert date from YYYY-MM-DD to DD.MM.YYYY
             const [year, month, day] = updates.arrival_date.split('-');
             const formattedDate = `${day}.${month}.${year}`;
-            console.log('Formatted date:', formattedDate);
             updates.arrival_date = formattedDate;
 
             console.log('Attempting to update animal with ID:', params.id);
