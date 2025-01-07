@@ -123,4 +123,27 @@ export async function updateZookeeper(id, updates) {
         console.error('DB: Error updating zookeeper:', error);
         throw error;
     }
+}
+
+export async function deleteZookeeper(id) {
+    try {
+        // First, get the zookeeper to check if it exists
+        const zookeeper = await getZookeeper(id);
+        if (!zookeeper) {
+            return null;
+        }
+
+        // Remove the zookeeper
+        const collection = await getCollection("zookeepers");
+        const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return null;
+        }
+
+        return id;
+    } catch (error) {
+        console.error('DB: Error deleting zookeeper:', error);
+        throw error;
+    }
 } 

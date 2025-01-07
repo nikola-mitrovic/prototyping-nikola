@@ -105,17 +105,30 @@ export async function updateAnimal(id, updates) {
 
 export async function deleteAnimal(id) {
     try {
+        // First, get the animal to check if it exists
+        const animal = await getAnimal(id);
+        if (!animal) {
+            return null;
+        }
+
+        // Get the zookeepers collection to update assigned zookeepers
+        const zookeepersCollection = await getCollection("zookeepers");
+        
+        // Remove animal_id from any zookeepers assigned to this animal
+        await zookeepersCollection.updateMany(
+            { animal_id: animal.id },
+            { $unset: { animal_id: "" } }
+        );
+
+        // Now delete the animal
         const collection = await getCollection("animals");
-        const query = { _id: new ObjectId(id) };
-        const result = await collection.deleteOne(query);
+        const result = await collection.deleteOne({ _id: new ObjectId(id) });
 
         if (result.deletedCount === 0) {
-            console.log("DB: No animal with id " + id);
             return null;
-        } else {
-            console.log("DB: Animal with id " + id + " has been successfully deleted.");
-            return id;
         }
+
+        return id;
     } catch (error) {
         console.error('DB: Error deleting animal:', error);
         throw error;
