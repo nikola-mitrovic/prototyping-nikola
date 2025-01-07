@@ -1,14 +1,28 @@
 <script>
-    // Get current timestamp in HH:MM:SS format
-    function getCurrentTime() {
-        const now = new Date();
-        return now.toLocaleTimeString('en-US', { hour12: false });
+    import { DateTime } from 'luxon';
+
+    // Get current Dubai time
+    function getDubaiTime() {
+        return DateTime
+            .now()
+            .setZone('Asia/Dubai')
+            .toFormat('HH:mm:ss');
+    }
+
+    // Get Dubai timezone offset
+    function getDubaiOffset() {
+        return DateTime
+            .now()
+            .setZone('Asia/Dubai')
+            .toFormat('ZZZZ');
     }
 
     // Update timestamp every second
-    let timestamp = getCurrentTime();
+    let timestamp = getDubaiTime();
+    let timezoneOffset = getDubaiOffset();
+    
     setInterval(() => {
-        timestamp = getCurrentTime();
+        timestamp = getDubaiTime();
     }, 1000);
 </script>
 
@@ -20,7 +34,16 @@
                     <i class="bi bi-camera-video-fill me-2"></i>
                     Zoo Security Dashboard
                 </h1>
-                <p class="text-muted mb-0">Live Camera Feeds</p>
+                <div class="d-flex align-items-center gap-3 text-muted mb-0">
+                    <p class="mb-0">
+                        <i class="bi bi-geo-alt-fill me-1"></i>
+                        Location: Dubai, UAE
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-clock-fill me-1"></i>
+                        Dubai Time: {timestamp} <span class="timezone-badge">{timezoneOffset}</span>
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -232,6 +255,15 @@
     }
 
     .location {
+        color: #6c757d;
+    }
+
+    .timezone-badge {
+        background-color: #e9ecef;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-left: 8px;
         color: #6c757d;
     }
 </style>
