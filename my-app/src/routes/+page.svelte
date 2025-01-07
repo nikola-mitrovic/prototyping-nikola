@@ -1,4 +1,5 @@
 <script>
+    import TimelineChart from '$lib/components/TimelineChart.svelte';
     export let data;
     
     // Format the counts for display
@@ -8,6 +9,7 @@
 
 <svelte:head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </svelte:head>
 
 <div class="container py-4">
@@ -23,7 +25,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <div class="bg-primary bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-emoji-smile fs-4 text-primary"></i>
+                            <i class="fa fa-paw fs-4 text-primary" aria-hidden="true"></i>
                         </div>
                     </div>
                     <h3 class="fs-1 fw-bold mb-2">{animalCount}</h3>
@@ -65,6 +67,18 @@
                             <i class="bi bi-chevron-right ms-auto"></i>
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Growth Timeline</h5>
+                    <TimelineChart 
+                        animalData={data.animals} 
+                        zookeeperData={data.zookeepers}
+                    />
                 </div>
             </div>
         </div>
