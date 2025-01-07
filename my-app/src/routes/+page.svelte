@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </svelte:head>
 
-<div class="min-vh-100 bg-light">
+<div class="min-vh-100">
     <div class="container py-4">
         <div class="mb-4">
             <h1 class="display-4 fw-bold text-dark">Welcome to Zoo Manager</h1>
@@ -22,7 +22,7 @@
         <div class="row g-4">
             <!-- Total Animals Card -->
             <div class="col-md-6">
-                <div class="card h-100 border-0 rounded-4 shadow-sm bg-white">
+                <div class="card h-100 border-0 rounded-4 shadow-sm">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-primary bg-opacity-10 p-3 rounded-3">
@@ -37,7 +37,7 @@
 
             <!-- Active Zookeepers Card -->
             <div class="col-md-6">
-                <div class="card h-100 border-0 rounded-4 shadow-sm bg-white">
+                <div class="card h-100 border-0 rounded-4 shadow-sm">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-success bg-opacity-10 p-3 rounded-3">
@@ -53,7 +53,7 @@
 
         <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card border-0 rounded-4 shadow-sm bg-white">
+                <div class="card border-0 rounded-4 shadow-sm">
                     <div class="card-body p-4">
                         <h5 class="card-title fw-bold text-dark mb-4">Quick Actions</h5>
                         <div class="list-group list-group-flush">
@@ -67,13 +67,18 @@
                                 <span class="fw-medium">Add New Zookeeper</span>
                                 <i class="bi bi-chevron-right ms-auto text-secondary"></i>
                             </a>
+                            <a href="/security" class="list-group-item list-group-item-action d-flex align-items-center rounded-3 mt-2">
+                                <i class="bi bi-camera-video me-2 text-primary"></i>
+                                <span class="fw-medium">View Security Cameras</span>
+                                <i class="bi bi-chevron-right ms-auto text-secondary"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card border-0 rounded-4 shadow-sm bg-white">
+                <div class="card border-0 rounded-4 shadow-sm">
                     <div class="card-body p-4">
                         <h5 class="card-title fw-bold text-dark mb-4">Growth Timeline</h5>
                         <TimelineChart 
@@ -89,10 +94,11 @@
 
 <style>
     :global(body) {
-        background-color: #f8f9fa;
+        background-color: white;
     }
     .card {
         transition: transform 0.2s;
+        background-color: white;
     }
     .card:hover {
         transform: translateY(-5px);
@@ -100,9 +106,9 @@
     .list-group-item {
         border: none;
         padding: 1rem;
-        background-color: #f8f9fa;
+        background-color: white;
     }
     .list-group-item:hover {
-        background-color: #f0f2f5;
+        background-color: #f8f9fa;
     }
 </style>

@@ -4,7 +4,7 @@
 
 <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold text-white" href="/">ZooKeeper</a>
+    <a class="navbar-brand fw-bold text-white" href="/">ZooManager</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -23,6 +23,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link text-white" href="/zookeepers">Zookeepers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/security">Security</a>
         </li>
       </ul>
     </div>
