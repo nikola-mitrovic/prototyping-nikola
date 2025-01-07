@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { getDb, getCollection } from "./db-connection.js";
+import { getCollection } from "./db-connection.js";
 
 export async function getAnimals() {
     let animals = [];

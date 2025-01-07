@@ -17,7 +17,8 @@ export async function initDb() {
     }
 }
 
-export async function getDb() {
+// Internal function, not exported
+async function getDb() {
     if (!db) {
         await initDb();
     }

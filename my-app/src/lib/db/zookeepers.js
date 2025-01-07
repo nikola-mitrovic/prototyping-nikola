@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { getDb, getCollection } from "./db-connection.js";
+import { getCollection } from "./db-connection.js";
 import { getAnimal } from "./animals.js";
 
 export async function getZookeepers() {
@@ -114,36 +114,16 @@ export async function getZookeeperAssignedAnimals(zookeeperId) {
 
 export async function assignAnimalToZookeeper(zookeeperId, animalId) {
     try {
-        // Get current zookeeper to check if they have an existing animal
-        const zookeeper = await getZookeeper(zookeeperId);
-        const currentAnimalId = zookeeper.animal_id;
-
-        // If there's an existing animal, remove zookeeper from its zookeeper_ids
-        if (currentAnimalId) {
-            const animalsCollection = await getCollection("animals");
-            await animalsCollection.updateOne(
-                { _id: new ObjectId(currentAnimalId) },
-                { $pull: { zookeeper_ids: zookeeperId } }
-            );
-        }
-
-        // Update zookeeper with new animal_id
-        const collection = await getCollection("zookeepers");
-        const result = await collection.updateOne(
-            { _id: new ObjectId(zookeeperId) },
-            { $set: { animal_id: animalId } }
+        // Add zookeeper to animal's zookeeper_ids array
+        const animalsCollection = await getCollection("animals");
+        const result = await animalsCollection.updateOne(
+            { _id: new ObjectId(animalId) },
+            { $addToSet: { zookeeper_ids: zookeeperId } }
         );
 
         if (result.modifiedCount === 0) {
             throw new Error('Failed to assign animal to zookeeper');
         }
-
-        // Add zookeeper to new animal's zookeeper_ids array
-        const animalsCollection = await getCollection("animals");
-        await animalsCollection.updateOne(
-            { _id: new ObjectId(animalId) },
-            { $addToSet: { zookeeper_ids: zookeeperId } }
-        );
 
         return true;
     } catch (error) {
@@ -154,27 +134,19 @@ export async function assignAnimalToZookeeper(zookeeperId, animalId) {
 
 export async function removeAnimalFromZookeeper(zookeeperId, animalId) {
     try {
-        // Remove animal_id from zookeeper
-        const collection = await getCollection("zookeepers");
-        const result = await collection.updateOne(
-            { _id: new ObjectId(zookeeperId) },
-            { $unset: { animal_id: "" } }
-        );
-
-        if (result.modifiedCount === 0) {
-            throw new Error('Failed to remove animal from zookeeper');
-        }
-
-        // Remove zookeeper from animal's zookeeper_ids array
         const animalsCollection = await getCollection("animals");
-        await animalsCollection.updateOne(
+        const result = await animalsCollection.updateOne(
             { _id: new ObjectId(animalId) },
             { $pull: { zookeeper_ids: zookeeperId } }
         );
 
+        if (result.modifiedCount === 0) {
+            throw new Error('Failed to remove zookeeper from animal');
+        }
+
         return true;
     } catch (error) {
-        console.error('DB: Error removing animal from zookeeper:', error);
+        console.error('DB: Error removing zookeeper from animal:', error);
         throw error;
     }
 } 
