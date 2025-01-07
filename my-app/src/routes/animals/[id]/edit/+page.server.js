@@ -1,67 +1,61 @@
 import { getAnimal, updateAnimal } from '$lib/db/animals.js';
-import { error, redirect } from '@sveltejs/kit';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ params }) {
-    try {
-        console.log('DB: Getting animal with ID:', params.id);
-        const animal = await getAnimal(params.id);
-        
-        if (!animal) {
-            throw error(404, {
-                message: 'Animal not found'
-            });
-        }
-
+    const animal = await getAnimal(params.id);
+    if (!animal) {
         return {
-            animal
+            status: 404,
+            error: 'Animal not found'
         };
-    } catch (err) {
-        console.error('Error loading animal:', err);
-        throw error(500, {
-            message: 'Failed to load animal'
-        });
     }
+    return { animal };
 }
 
+/** @type {import('./$types').Actions} */
 export const actions = {
     default: async ({ request, params }) => {
-        try {
-            const formData = await request.formData();
-            console.log('Form data received:', Object.fromEntries(formData));
+        const formData = await request.formData();
+        const name = formData.get('name');
+        const nickname = formData.get('nickname');
+        const age = formData.get('age');
+        const gender = formData.get('gender');
+        const diet = formData.get('diet');
+        const arrival_date = formData.get('arrival_date');
+        const image = formData.get('image');
 
-            // Convert form data to object and handle type conversions
-            const updates = {
-                name: formData.get('name'),
-                nickname: formData.get('nickname'),
-                age: parseInt(formData.get('age')),
-                gender: formData.get('gender'),
-                diet: formData.get('diet'),
-                arrival_date: formData.get('arrival_date'),
-                image: formData.get('image')
-            };
-
-            console.log('Processed updates:', updates);
-
-            // Convert date from YYYY-MM-DD to DD.MM.YYYY
-            const [year, month, day] = updates.arrival_date.split('-');
-            const formattedDate = `${day}.${month}.${year}`;
-            updates.arrival_date = formattedDate;
-
-            console.log('Attempting to update animal with ID:', params.id);
-            const result = await updateAnimal(params.id, updates);
-            console.log('Update result:', result);
-
-            // Redirect to animal details page on success
-            throw redirect(303, `/animals/${params.id}`);
-        } catch (err) {
-            console.error('Detailed error:', err);
-            
-            // If it's a redirect, let it pass through
-            if (err.status === 303) throw err;
-            
-            // Otherwise, return the error to display in the form
+        // Basic validation
+        if (!name || !nickname || !age || !gender || !diet || !arrival_date) {
             return {
-                error: 'Failed to update animal. Please try again.'
+                status: 400,
+                error: 'All required fields must be filled out'
+            };
+        }
+
+        // Convert arrival_date from YYYY-MM-DD to DD.MM.YYYY
+        const [year, month, day] = arrival_date.split('-');
+        const formattedDate = `${day}.${month}.${year}`;
+
+        try {
+            const updatedAnimal = await updateAnimal(params.id, {
+                name,
+                nickname,
+                age: parseInt(age),
+                gender,
+                diet,
+                arrival_date: formattedDate,
+                image: image || null
+            });
+
+            return {
+                status: 200,
+                type: 'success',
+                animal: updatedAnimal
+            };
+        } catch (error) {
+            return {
+                status: 500,
+                error: 'Failed to update animal'
             };
         }
     }

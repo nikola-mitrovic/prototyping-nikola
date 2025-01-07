@@ -1,6 +1,7 @@
 <!-- Edit Animal Form -->
 <script>
     import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
     export let data;
     export let form;
 
@@ -9,6 +10,14 @@
         if (!dateStr) return '';
         const [day, month, year] = dateStr.split('.');
         return `${year}-${month}-${day}`;
+    }
+
+    function handleSubmit() {
+        return async ({ result }) => {
+            if (result.type === 'success') {
+                await goto(`/animals/${data.animal._id}`);
+            }
+        };
     }
 </script>
 
@@ -25,7 +34,7 @@
     <div class="card">
         <div class="card-body">
             <h2 class="card-title">Basic Information</h2>
-            <form method="POST" use:enhance>
+            <form method="POST" use:enhance={handleSubmit}>
                 <div class="mb-3">
                     <label for="name" class="form-label">Species</label>
                     <input type="text" class="form-control" id="name" name="name" value={data.animal.name} required>
@@ -36,47 +45,46 @@
                     <input type="text" class="form-control" id="nickname" name="nickname" value={data.animal.nickname} required>
                 </div>
 
-                <h2 class="mt-4">Additional Details</h2>
+                <div class="mb-3">
+                    <label for="age" class="form-label">Age (years)</label>
+                    <input type="number" class="form-control" id="age" name="age" value={data.animal.age} required min="0">
+                </div>
 
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="age" class="form-label">Age (years)</label>
-                        <input type="number" class="form-control" id="age" name="age" value={data.animal.age} required>
-                    </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="">Select gender...</option>
+                        <option value="Male" selected={data.animal.gender === 'Male'}>Male</option>
+                        <option value="Female" selected={data.animal.gender === 'Female'}>Female</option>
+                    </select>
+                </div>
 
-                    <div class="col-md-4 mb-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select class="form-select" id="gender" name="gender" required>
-                            <option value="Male" selected={data.animal.gender === 'Male'}>Male</option>
-                            <option value="Female" selected={data.animal.gender === 'Female'}>Female</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label for="diet" class="form-label">Diet</label>
-                        <select class="form-select" id="diet" name="diet" required>
-                            <option value="carnivore" selected={data.animal.diet === 'carnivore'}>Carnivore</option>
-                            <option value="herbivore" selected={data.animal.diet === 'herbivore'}>Herbivore</option>
-                            <option value="omnivore" selected={data.animal.diet === 'omnivore'}>Omnivore</option>
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <label for="diet" class="form-label">Diet</label>
+                    <input type="text" class="form-control" id="diet" name="diet" value={data.animal.diet} required>
                 </div>
 
                 <div class="mb-3">
                     <label for="arrival_date" class="form-label">Arrival Date</label>
-                    <input type="date" class="form-control" id="arrival_date" name="arrival_date" 
-                           value={formatDateForInput(data.animal.arrival_date)} required>
+                    <input 
+                        type="date" 
+                        class="form-control" 
+                        id="arrival_date" 
+                        name="arrival_date" 
+                        value={formatDateForInput(data.animal.arrival_date)}
+                        required
+                    >
                 </div>
 
-                <input type="hidden" name="image" value={data.animal.image}>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image URL</label>
+                    <input type="text" class="form-control" id="image" name="image" value={data.animal.image}>
+                    <div class="form-text">Optional: Enter a URL or path for the animal's image</div>
+                </div>
 
-                <div class="mt-4 d-flex justify-content-between">
-                    <a href="/animals/{data.animal._id}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Cancel
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg"></i> Save Changes
-                    </button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="/animals/{data.animal._id}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>

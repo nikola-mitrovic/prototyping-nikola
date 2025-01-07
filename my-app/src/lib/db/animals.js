@@ -77,29 +77,29 @@ export async function createAnimal(animal) {
     }
 }
 
+/**
+ * Updates an animal in the database
+ * @param {string} id - The ID of the animal to update
+ * @param {Object} updates - The fields to update
+ * @returns {Promise<Object>} The updated animal
+ */
 export async function updateAnimal(id, updates) {
     try {
-        console.log('DB: Updating animal with ID:', id);
-        console.log('DB: Update data:', updates);
-        
         const collection = await getCollection("animals");
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },
             { $set: updates }
         );
-        
-        console.log('DB: Update result:', result);
-        
+
         if (result.modifiedCount === 0) {
-            console.log('DB: No animal was updated');
-            throw new Error('No animal was updated');
+            throw new Error('Animal not found');
         }
-        
-        console.log('DB: Animal updated successfully');
-        return result;
-    } catch (err) {
-        console.error('DB: Error in updateAnimal:', err);
-        throw err;
+
+        // Get and return the updated animal
+        return await getAnimal(id);
+    } catch (error) {
+        console.error('DB: Error updating animal:', error);
+        throw error;
     }
 }
 
