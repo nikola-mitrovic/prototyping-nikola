@@ -3,13 +3,11 @@
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
     export let data;
-    const { animal, assignedZookeepers, availableZookeepers, zookeeperError } = data;
+    const { animal, assignedZookeepers, availableZookeepers } = data;
 
-    let showModal = false;
     let showDeleteModal = false;
-    let selectedZookeeperId = '';
-    let assignmentError = '';
     let deleteError = '';
+    let selectedZookeeperId = '';
 
     async function handleDelete() {
         try {
@@ -32,6 +30,8 @@
     }
 
     async function handleAssignZookeeper() {
+        if (!selectedZookeeperId) return;
+
         try {
             const response = await fetch(`/animals/${animal._id}/assign-zookeeper`, {
                 method: 'POST',
@@ -41,21 +41,21 @@
                 body: JSON.stringify({ zookeeper_id: selectedZookeeperId })
             });
 
-            const result = await response.json();
-            
             if (response.ok) {
-                // Reload the page to show updated assignments
+                // Refresh the page to show updated assignments
                 window.location.reload();
             } else {
-                assignmentError = result.error;
+                const result = await response.json();
+                alert(result.error || 'Failed to assign zookeeper');
             }
         } catch (error) {
-            assignmentError = 'Failed to assign zookeeper. Please try again.';
+            alert('Failed to assign zookeeper. Please try again.');
         }
     }
 
     async function handleRemoveZookeeper(zookeeperId) {
-        console.log('Removing zookeeper:', zookeeperId, 'from animal:', animal._id);
+        if (!confirm('Are you sure you want to remove this zookeeper?')) return;
+
         try {
             const response = await fetch(`/animals/${animal._id}/remove-zookeeper`, {
                 method: 'POST',
@@ -65,23 +65,16 @@
                 body: JSON.stringify({ zookeeper_id: zookeeperId })
             });
 
-            const result = await response.json();
-            
             if (response.ok) {
-                console.log('Removal successful');
+                // Refresh the page to show updated assignments
                 window.location.reload();
             } else {
-                console.error('Removal failed:', result.error);
-                assignmentError = result.error;
+                const result = await response.json();
+                alert(result.error || 'Failed to remove zookeeper');
             }
         } catch (error) {
-            console.error('Error removing zookeeper:', error);
-            assignmentError = 'Failed to remove zookeeper. Please try again.';
+            alert('Failed to remove zookeeper. Please try again.');
         }
-    }
-
-    function handleSelectZookeeper(event) {
-        selectedZookeeperId = event.target.value;
     }
 </script>
 
@@ -100,21 +93,9 @@
         </div>
     {/if}
 
-    <!-- Zookeeper Load Error Warning -->
-    {#if zookeeperError}
-        <div class="alert alert-warning mb-4">
-            <p class="mb-0">
-                Unable to load zookeeper information. The data might be temporarily unavailable.
-            </p>
-        </div>
-    {/if}
-
     <div class="mb-4">
         <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1>{animal.nickname}</h1>
-                <p class="text-muted mb-0">{animal.name}</p>
-            </div>
+            <h1>{animal.nickname} the {animal.name}</h1>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-danger" on:click={() => showDeleteModal = true}>
                     <i class="bi bi-trash"></i> Delete Animal
@@ -130,122 +111,93 @@
     </div>
 
     <div class="row">
-        <!-- Image Section -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    {#if animal.image}
-                        <img 
-                            src={animal.image} 
-                            alt={animal.name}
-                            class="img-fluid rounded"
-                            style="max-height: 300px; object-fit: cover;"
-                        >
-                    {:else}
-                        <div class="alert alert-info mb-0">
-                            No image available
-                        </div>
-                    {/if}
-                </div>
-            </div>
-        </div>
-
-        <!-- Information Section -->
-        <div class="col-md-8 mb-4">
+        <!-- Animal Information -->
+        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Animal Information</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <!-- Basic Information -->
-                        <div class="col-md-6">
-                            <h6 class="border-bottom pb-2 mb-3">Basic Details</h6>
-                            <dl>
-                                <dt>Species</dt>
-                                <dd>{animal.name}</dd>
+                    <dl class="row">
+                        <dt class="col-sm-4">Species</dt>
+                        <dd class="col-sm-8">{animal.name}</dd>
 
-                                <dt>Nickname</dt>
-                                <dd>{animal.nickname}</dd>
+                        <dt class="col-sm-4">Nickname</dt>
+                        <dd class="col-sm-8">{animal.nickname}</dd>
 
-                                <dt>Age</dt>
-                                <dd>{animal.age} years</dd>
+                        <dt class="col-sm-4">Age</dt>
+                        <dd class="col-sm-8">{animal.age} years</dd>
 
-                                <dt>Gender</dt>
-                                <dd>{animal.gender}</dd>
-                            </dl>
-                        </div>
+                        <dt class="col-sm-4">Gender</dt>
+                        <dd class="col-sm-8">{animal.gender}</dd>
 
-                        <!-- Care Information -->
-                        <div class="col-md-6">
-                            <h6 class="border-bottom pb-2 mb-3">Care Details</h6>
-                            <dl>
-                                <dt>Diet</dt>
-                                <dd>{animal.diet}</dd>
+                        <dt class="col-sm-4">Diet</dt>
+                        <dd class="col-sm-8">{animal.diet}</dd>
 
-                                <dt>Arrival Date</dt>
-                                <dd>{animal.arrival_date || 'Not specified'}</dd>
+                        <dt class="col-sm-4">Arrival Date</dt>
+                        <dd class="col-sm-8">{animal.arrival_date}</dd>
 
-                                <dt>ID Number</dt>
-                                <dd><small class="text-muted">{animal._id}</small></dd>
-                            </dl>
-                        </div>
-                    </div>
+                        <dt class="col-sm-4">ID</dt>
+                        <dd class="col-sm-8">{animal._id}</dd>
+                    </dl>
                 </div>
             </div>
         </div>
 
-        <!-- Assigned Zookeepers Section -->
-        <div class="col-12 mb-4">
+        <!-- Assigned Zookeepers -->
+        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Assigned Zookeepers</h5>
-                    <button class="btn btn-outline-primary btn-sm" 
-                            on:click={() => showModal = true}
-                            disabled={!availableZookeepers || availableZookeepers.length === 0}
-                            aria-label="Add new zookeeper">
-                        <i class="bi bi-person-plus-fill"></i> Add Zookeeper
-                    </button>
+                    {#if availableZookeepers.length > 0}
+                        <div class="input-group" style="max-width: 300px;">
+                            <select 
+                                class="form-select" 
+                                bind:value={selectedZookeeperId}
+                                aria-label="Select zookeeper">
+                                <option value="">Select a zookeeper...</option>
+                                {#each availableZookeepers as zookeeper}
+                                    <option value={zookeeper._id}>
+                                        {zookeeper.first_name} {zookeeper.last_name}
+                                    </option>
+                                {/each}
+                            </select>
+                            <button 
+                                class="btn btn-outline-primary" 
+                                on:click={handleAssignZookeeper}
+                                disabled={!selectedZookeeperId}>
+                                <i class="bi bi-plus-circle"></i> Assign
+                            </button>
+                        </div>
+                    {/if}
                 </div>
                 <div class="card-body">
-                    {#if assignedZookeepers && assignedZookeepers.length > 0}
-                        <div class="row g-3">
+                    {#if assignedZookeepers.length === 0}
+                        <div class="alert alert-info mb-0">
+                            <span>No zookeepers currently assigned to this animal.</span>
+                        </div>
+                    {:else}
+                        <div class="list-group">
                             {#each assignedZookeepers as zookeeper}
-                                <div class="col-12">
-                                    <div class="border rounded p-3">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="mb-1">{zookeeper.first_name} {zookeeper.last_name}</h6>
-                                                <p class="text-muted mb-0">
-                                                    <small>
-                                                        {zookeeper.gender} • Hired: {zookeeper.hire_date}
-                                                    </small>
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <button class="btn btn-danger btn-sm me-2" 
-                                                        on:click={() => handleRemoveZookeeper(zookeeper._id)}
-                                                        aria-label="Remove zookeeper">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </button>
-                                                <a href="/zookeepers/{zookeeper._id}" class="btn btn-primary btn-sm">
-                                                    <i class="bi bi-person-badge"></i> View Details
-                                                </a>
-                                            </div>
-                                        </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{zookeeper.first_name} {zookeeper.last_name}</h6>
+                                        <small class="text-muted">
+                                            {zookeeper.gender} • Hired: {zookeeper.hire_date}
+                                        </small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/zookeepers/{zookeeper._id}" class="btn btn-outline-primary btn-sm">
+                                            View
+                                        </a>
+                                        <button 
+                                            class="btn btn-outline-danger btn-sm"
+                                            on:click={() => handleRemoveZookeeper(zookeeper._id)}>
+                                            Remove
+                                        </button>
                                     </div>
                                 </div>
                             {/each}
-                        </div>
-                    {:else}
-                        <div class="alert alert-info mb-0 d-flex justify-content-between align-items-center">
-                            <span>No zookeepers currently assigned to this animal.</span>
-                            <button class="btn btn-outline-primary btn-sm" 
-                                    on:click={() => showModal = true}
-                                    disabled={!availableZookeepers || availableZookeepers.length === 0}
-                                    aria-label="Assign first zookeeper">
-                                <i class="bi bi-person-plus-fill"></i> Assign First Zookeeper
-                            </button>
                         </div>
                     {/if}
                 </div>
@@ -253,55 +205,6 @@
         </div>
     </div>
 </div>
-
-<!-- Add Zookeeper Modal -->
-{#if showModal}
-    <div class="modal show" tabindex="-1">
-        <div class="modal-backdrop show"></div>
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Assign Zookeeper to {animal.nickname}</h5>
-                    <button type="button" class="btn-close" on:click={() => showModal = false} aria-label="Close modal"></button>
-                </div>
-                <div class="modal-body">
-                    {#if assignmentError}
-                        <div class="alert alert-danger">
-                            {assignmentError}
-                        </div>
-                    {/if}
-                    
-                    {#if availableZookeepers.length === 0}
-                        <div class="alert alert-info">
-                            No available zookeepers. All zookeepers are currently assigned to animals.
-                        </div>
-                    {:else}
-                        <div class="mb-3">
-                            <label for="zookeeper" class="form-label">Select Zookeeper</label>
-                            <select id="zookeeper" class="form-select" on:change={handleSelectZookeeper}>
-                                <option value="">Choose a zookeeper...</option>
-                                {#each availableZookeepers as zookeeper}
-                                    <option value={zookeeper._id}>
-                                        {zookeeper.first_name} {zookeeper.last_name} ({zookeeper.gender})
-                                    </option>
-                                {/each}
-                            </select>
-                        </div>
-                    {/if}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" on:click={() => showModal = false}>Cancel</button>
-                    <button type="button" 
-                            class="btn btn-primary" 
-                            disabled={!selectedZookeeperId}
-                            on:click={handleAssignZookeeper}>
-                        Assign Zookeeper
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-{/if}
 
 <!-- Delete Confirmation Modal -->
 {#if showDeleteModal}
@@ -317,7 +220,7 @@
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         Are you sure you want to delete {animal.nickname} the {animal.name}? This action cannot be undone.
-                        {#if assignedZookeepers?.length > 0}
+                        {#if assignedZookeepers.length > 0}
                             <br><br>
                             <strong>Warning:</strong> This animal has {assignedZookeepers.length} assigned zookeeper{assignedZookeepers.length === 1 ? '' : 's'}. 
                             Deleting this animal will remove these assignments.

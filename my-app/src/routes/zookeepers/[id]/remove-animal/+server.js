@@ -4,25 +4,25 @@ import { removeZookeeperFromAnimal } from '$lib/db/animals.js';
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, params }) {
     try {
-        const { zookeeper_id } = await request.json();
+        const { animal_id } = await request.json();
         
-        if (!zookeeper_id) {
+        if (!animal_id) {
             return json(
-                { error: 'Zookeeper ID is required' },
+                { error: 'Animal ID is required' },
                 { status: 400 }
             );
         }
 
-        await removeZookeeperFromAnimal(params.id, zookeeper_id);
+        await removeZookeeperFromAnimal(animal_id, params.id);
 
         return json(
-            { message: 'Zookeeper removed successfully' },
+            { message: 'Animal removed successfully' },
             { status: 200 }
         );
     } catch (error) {
-        console.error('API: Error removing zookeeper:', error);
+        console.error('API: Error removing animal:', error);
         return json(
-            { error: error.message || 'Failed to remove zookeeper' },
+            { error: error.message || 'Failed to remove animal' },
             { status: 500 }
         );
     }

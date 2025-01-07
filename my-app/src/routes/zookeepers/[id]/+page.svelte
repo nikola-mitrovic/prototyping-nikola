@@ -3,10 +3,11 @@
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
     export let data;
-    const { zookeeper, assignedAnimal, animalError } = data;
+    const { zookeeper, assignedAnimals, availableAnimals } = data;
 
     let showDeleteModal = false;
     let deleteError = '';
+    let selectedAnimalId = '';
 
     async function handleDelete() {
         try {
@@ -25,6 +26,54 @@
         } catch (error) {
             deleteError = 'Failed to delete zookeeper. Please try again.';
             showDeleteModal = false;
+        }
+    }
+
+    async function handleAssignAnimal() {
+        if (!selectedAnimalId) return;
+
+        try {
+            const response = await fetch(`/zookeepers/${zookeeper._id}/assign-animal`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ animal_id: selectedAnimalId })
+            });
+
+            if (response.ok) {
+                // Refresh the page to show updated assignments
+                window.location.reload();
+            } else {
+                const result = await response.json();
+                alert(result.error || 'Failed to assign animal');
+            }
+        } catch (error) {
+            alert('Failed to assign animal. Please try again.');
+        }
+    }
+
+    async function handleRemoveAnimal(animalId) {
+        if (!confirm('Are you sure you want to remove this animal?')) return;
+
+        try {
+            const response = await fetch(`/zookeepers/${zookeeper._id}/remove-animal`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ animal_id: animalId })
+            });
+
+            if (response.ok) {
+                // Refresh the page to show updated assignments
+                window.location.reload();
+            } else {
+                const result = await response.json();
+                alert(result.error || 'Failed to remove animal');
+            }
+        } catch (error) {
+            alert('Failed to remove animal. Please try again.');
         }
     }
 </script>
@@ -86,35 +135,60 @@
             </div>
         </div>
 
-        <!-- Assigned Animal -->
+        <!-- Assigned Animals -->
         <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Assigned Animal</h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Assigned Animals</h5>
+                    {#if availableAnimals.length > 0}
+                        <div class="input-group" style="max-width: 300px;">
+                            <select 
+                                class="form-select" 
+                                bind:value={selectedAnimalId}
+                                aria-label="Select animal">
+                                <option value="">Select an animal...</option>
+                                {#each availableAnimals as animal}
+                                    <option value={animal._id}>
+                                        {animal.nickname} the {animal.name}
+                                    </option>
+                                {/each}
+                            </select>
+                            <button 
+                                class="btn btn-outline-primary" 
+                                on:click={handleAssignAnimal}
+                                disabled={!selectedAnimalId}>
+                                <i class="bi bi-plus-circle"></i> Assign
+                            </button>
+                        </div>
+                    {/if}
                 </div>
                 <div class="card-body">
-                    {#if animalError}
-                        <div class="alert alert-warning">
-                            Unable to load animal information. The data might be temporarily unavailable.
-                        </div>
-                    {:else if assignedAnimal}
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">{assignedAnimal.nickname}</h6>
-                                <p class="text-muted mb-2">{assignedAnimal.name}</p>
-                                <p class="mb-0">
-                                    <small>
-                                        {assignedAnimal.gender} • {assignedAnimal.age} years old
-                                    </small>
-                                </p>
-                            </div>
-                            <a href="/animals/{assignedAnimal._id}" class="btn btn-primary btn-sm">
-                                View Animal
-                            </a>
+                    {#if assignedAnimals.length === 0}
+                        <div class="alert alert-info mb-0">
+                            <span>No animals currently assigned to this zookeeper.</span>
                         </div>
                     {:else}
-                        <div class="alert alert-info mb-0">
-                            <span>No animal currently assigned to this zookeeper.</span>
+                        <div class="list-group">
+                            {#each assignedAnimals as animal}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{animal.nickname} the {animal.name}</h6>
+                                        <small class="text-muted">
+                                            {animal.gender} • {animal.age} years old • {animal.diet}
+                                        </small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/animals/{animal._id}" class="btn btn-outline-primary btn-sm">
+                                            View
+                                        </a>
+                                        <button 
+                                            class="btn btn-outline-danger btn-sm"
+                                            on:click={() => handleRemoveAnimal(animal._id)}>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            {/each}
                         </div>
                     {/if}
                 </div>
@@ -137,10 +211,10 @@
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         Are you sure you want to delete {zookeeper.first_name} {zookeeper.last_name}? This action cannot be undone.
-                        {#if assignedAnimal}
+                        {#if assignedAnimals.length > 0}
                             <br><br>
-                            <strong>Warning:</strong> This zookeeper is currently assigned to {assignedAnimal.nickname} the {assignedAnimal.name}. 
-                            Deleting this zookeeper will remove this assignment.
+                            <strong>Warning:</strong> This zookeeper is currently assigned to {assignedAnimals.length} animal{assignedAnimals.length === 1 ? '' : 's'}. 
+                            Deleting this zookeeper will remove these assignments.
                         {/if}
                     </div>
                 </div>

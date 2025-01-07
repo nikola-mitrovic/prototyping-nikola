@@ -1,21 +1,29 @@
-import { assignZookeeperToAnimal } from '$lib/db/zookeepers.js';
 import { json } from '@sveltejs/kit';
+import { addZookeeperToAnimal } from '$lib/db/animals.js';
 
+/** @type {import('./$types').RequestHandler} */
 export async function POST({ request, params }) {
     try {
         const { zookeeper_id } = await request.json();
-        const animal_id = params.id;
         
         if (!zookeeper_id) {
-            return json({ error: 'Zookeeper ID is required' }, { status: 400 });
+            return json(
+                { error: 'Zookeeper ID is required' },
+                { status: 400 }
+            );
         }
-        
-        console.log(`API: Assigning zookeeper ${zookeeper_id} to animal ${animal_id}`);
-        await assignZookeeperToAnimal(animal_id, zookeeper_id);
-        
-        return json({ success: true });
+
+        await addZookeeperToAnimal(params.id, zookeeper_id);
+
+        return json(
+            { message: 'Zookeeper assigned successfully' },
+            { status: 200 }
+        );
     } catch (error) {
         console.error('API: Error assigning zookeeper:', error);
-        return json({ error: error.message }, { status: 500 });
+        return json(
+            { error: error.message || 'Failed to assign zookeeper' },
+            { status: 500 }
+        );
     }
 } 
