@@ -31,9 +31,6 @@
                         </div>
                         <h3 class="fs-1 fw-bold mb-2 text-dark">{animalCount}</h3>
                         <p class="text-secondary mb-0">Total Animals</p>
-                        <div class="mt-2">
-                            <small class="text-success">+2 from last month</small>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -49,9 +46,6 @@
                         </div>
                         <h3 class="fs-1 fw-bold mb-2 text-dark">{zookeeperCount}</h3>
                         <p class="text-secondary mb-0">Active Zookeepers</p>
-                        <div class="mt-2">
-                            <small class="text-muted">Currently on duty</small>
-                        </div>
                     </div>
                 </div>
             </div>
