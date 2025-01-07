@@ -139,7 +139,7 @@
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Assigned Animals</h5>
+                    <h5 class="card-title mb-0">Assigned Animal</h5>
                     {#if availableAnimals.length > 0}
                         <div class="input-group" style="max-width: 300px;">
                             <select 

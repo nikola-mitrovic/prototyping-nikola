@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { removeZookeeperFromAnimal } from '$lib/db/animals.js';
+import { removeAnimalFromZookeeper } from '$lib/db/zookeepers.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, params }) {
@@ -13,7 +13,7 @@ export async function POST({ request, params }) {
             );
         }
 
-        await removeZookeeperFromAnimal(animal_id, params.id);
+        await removeAnimalFromZookeeper(params.id, animal_id);
 
         return json(
             { message: 'Animal removed successfully' },
