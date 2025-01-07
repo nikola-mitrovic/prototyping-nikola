@@ -1,4 +1,4 @@
-import { assignKeeperToAnimal } from '$lib/db/zookeepers.js';
+import { assignAnimalToZookeeper } from '$lib/db/zookeepers.js';
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request, params }) {
@@ -11,7 +11,7 @@ export async function POST({ request, params }) {
         }
         
         console.log(`API: Assigning keeper ${keeper_id} to animal ${animal_id}`);
-        await assignKeeperToAnimal(animal_id, keeper_id);
+        await assignAnimalToZookeeper(keeper_id, animal_id);
         
         return json({ success: true });
     } catch (error) {
