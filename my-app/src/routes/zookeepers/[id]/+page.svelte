@@ -235,6 +235,14 @@
 </svelte:head>
 
 <style>
+    :global(body) {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        background-color: white;
+    }
+
     :global(.modal.show) {
         display: block;
         position: fixed;

@@ -62,7 +62,7 @@
 </div>
 
 <!-- Table Section -->
-<div class="card border-0 rounded-4 shadow-sm">
+<div class="card border-0 rounded-4 shadow-sm mb-5">
     <div class="table-responsive">
         <table class="table align-middle mb-0">
             <thead>
