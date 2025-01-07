@@ -1,3 +1,12 @@
-body {
-    background-color: #f8f9fa;
+/* Global background color */
+html, body {
+    background-color: #f5f5f5 !important; /* Light grey */
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure background color persists in all contexts */
+:global(body) {
+    background-color: #f5f5f5 !important;
 }

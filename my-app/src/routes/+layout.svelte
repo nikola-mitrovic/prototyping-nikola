@@ -37,6 +37,11 @@
 </div>
 
 <style>
+  :global(html), :global(body) {
+    background-color: #f5f5f5 !important;
+    min-height: 100vh;
+  }
+  
   .navbar {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
