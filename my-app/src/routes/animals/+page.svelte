@@ -93,7 +93,9 @@
                             <td>{animal.gender}</td>
                             <td>{animal.arrival_date}</td>
                             <td class="text-end pe-4">
-                                <a href="/animals/{animal._id}" class="text-secondary text-decoration-none">
+                                <a href="/animals/{animal._id}" 
+                                    class="text-secondary text-decoration-none"
+                                    aria-label="View details for {animal.nickname}">
                                     <i class="bi bi-eye"></i>
                                 </a>
                             </td>
@@ -120,18 +122,6 @@
         background-color: #3a53d0;
     }
 
-    .btn-light {
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        color: #495057;
-    }
-
-    .btn-light:hover {
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-        color: #212529;
-    }
-    
     .table th {
         font-weight: 600;
         color: #6c757d;
