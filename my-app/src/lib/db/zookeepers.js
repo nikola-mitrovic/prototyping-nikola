@@ -33,28 +33,8 @@ export async function getZookeeper(id) {
     }
 }
 
-async function getHighestZookeeperId() {
-    try {
-        const collection = await getCollection("zookeepers");
-        const zookeepers = await collection.find({}).toArray();
-        
-        if (!zookeepers || zookeepers.length === 0) {
-            return 0;
-        }
-        
-        const highestId = Math.max(...zookeepers.map(zookeeper => zookeeper.id || 0));
-        return highestId;
-    } catch (error) {
-        console.error('DB: Error getting highest zookeeper ID:', error);
-        throw error;
-    }
-}
-
 export async function createZookeeper(zookeeper) {
     try {
-        const highestId = await getHighestZookeeperId();
-        zookeeper.id = highestId + 1;
-        
         const collection = await getCollection("zookeepers");
         const result = await collection.insertOne(zookeeper);
         return result.insertedId.toString();
