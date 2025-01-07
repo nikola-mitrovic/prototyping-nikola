@@ -3,33 +3,49 @@
     export let data;
 </script>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Zookeepers</h1>
-        <a href="/zookeepers/create" class="btn btn-primary">Add New Zookeeper</a>
-    </div>
+<h1 class="page-title">Zookeepers</h1>
 
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {#if data.zookeepers && data.zookeepers.length > 0}
-        <div class="row g-4">
-            {#each data.zookeepers as zookeeper}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">{zookeeper.first_name} {zookeeper.last_name}</h5>
-                            <p class="card-text">
-                                <strong>Gender:</strong> {zookeeper.gender}<br>
-                                <strong>Hire Date:</strong> {zookeeper.hire_date}<br>
-                                <strong>Assigned Animal ID:</strong> {zookeeper.animal_id || 'None assigned'}
-                            </p>
-                            <a href="/zookeepers/{zookeeper._id}" class="btn btn-primary btn-sm">View Details</a>
-                        </div>
+        {#each data.zookeepers as zookeeper}
+            <div class="col">
+                <div class="card h-100 border-0 rounded-4 shadow-sm bg-white">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold text-dark mb-3">
+                            {zookeeper.first_name} {zookeeper.last_name}
+                        </h5>
+                        <p class="card-text text-secondary mb-3">
+                            <i class="bi bi-calendar me-2"></i>
+                            Hired: {zookeeper.hire_date}
+                        </p>
+                        <a href="/zookeepers/{zookeeper._id}" class="btn btn-outline-primary rounded-3">
+                            View Details
+                        </a>
                     </div>
                 </div>
-            {/each}
-        </div>
+            </div>
+        {/each}
     {:else}
-        <div class="alert alert-info">
-            No zookeepers found. Add some zookeepers to get started!
+        <div class="col-12">
+            <div class="alert alert-info">
+                No zookeepers found. Add some zookeepers to get started!
+            </div>
         </div>
     {/if}
-</div> 
+</div>
+
+<div class="mt-4">
+    <a href="/zookeepers/create" class="btn btn-primary rounded-3">
+        <i class="bi bi-plus-circle me-2"></i>
+        Add New Zookeeper
+    </a>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style> 
