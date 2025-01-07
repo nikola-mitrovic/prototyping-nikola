@@ -39,7 +39,6 @@ export const actions = {
             // Create the zookeeper
             console.log('Attempting to create zookeeper:', zookeeper);
             const id = await createZookeeper(zookeeper);
-            console.log('Created zookeeper with ID:', id);
             
             if (id) {
                 console.log('Zookeeper creation successful');
