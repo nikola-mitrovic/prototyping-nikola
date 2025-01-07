@@ -22,7 +22,6 @@ export const actions = {
         const gender = formData.get('gender');
         const diet = formData.get('diet');
         const arrival_date = formData.get('arrival_date');
-        const image = formData.get('image');
 
         // Basic validation
         if (!name || !nickname || !age || !gender || !diet || !arrival_date) {
@@ -43,8 +42,7 @@ export const actions = {
                 age: parseInt(age),
                 gender,
                 diet,
-                arrival_date: formattedDate,
-                image: image || null
+                arrival_date: formattedDate
             });
 
             return {

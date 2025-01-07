@@ -15,13 +15,6 @@ export const actions = {
         };
         console.log('Received form data:', zookeeper);
 
-        // Only add animal_id if it was provided
-        const animal_id = formData.get('animal_id');
-        if (animal_id) {
-            zookeeper.animal_id = parseInt(animal_id);
-            console.log('Added animal_id:', zookeeper.animal_id);
-        }
-
         try {
             // Validate required fields
             if (!zookeeper.first_name || !zookeeper.last_name || !zookeeper.gender || !zookeeper.hire_date) {

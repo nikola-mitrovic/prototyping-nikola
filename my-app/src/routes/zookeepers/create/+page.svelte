@@ -78,19 +78,6 @@
                             >
                         </div>
 
-                        <!-- Animal ID (Optional) -->
-                        <div class="mb-3">
-                            <label for="animal_id" class="form-label">Animal ID (Optional)</label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                id="animal_id"
-                                name="animal_id"
-                                value={form?.zookeeper?.animal_id || ''}
-                            >
-                            <div class="form-text">Optional: Enter the ID of the animal this zookeeper will be responsible for</div>
-                        </div>
-
                         <button type="submit" class="btn btn-primary">Add Zookeeper</button>
                     </form>
                 </div>

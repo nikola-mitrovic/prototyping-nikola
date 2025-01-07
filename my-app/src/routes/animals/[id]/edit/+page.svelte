@@ -76,12 +76,6 @@
                     >
                 </div>
 
-                <div class="mb-3">
-                    <label for="image" class="form-label">Image URL</label>
-                    <input type="text" class="form-control" id="image" name="image" value={data.animal.image}>
-                    <div class="form-text">Optional: Enter a URL or path for the animal's image</div>
-                </div>
-
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                     <a href="/animals/{data.animal._id}" class="btn btn-secondary">Cancel</a>
