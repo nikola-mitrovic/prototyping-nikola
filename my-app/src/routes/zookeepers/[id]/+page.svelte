@@ -15,8 +15,17 @@
     {/if}
 
     <div class="mb-4">
-        <h1>{zookeeper.first_name} {zookeeper.last_name}</h1>
-        <a href="/zookeepers" class="btn btn-secondary">Back to Zookeepers</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>{zookeeper.first_name} {zookeeper.last_name}</h1>
+            <div class="d-flex gap-2">
+                <a href="/zookeepers/{zookeeper._id}/edit" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Edit Zookeeper
+                </a>
+                <a href="/zookeepers" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Zookeepers
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="row">

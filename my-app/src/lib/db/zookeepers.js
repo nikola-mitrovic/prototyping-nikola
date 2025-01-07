@@ -105,37 +105,20 @@ export async function assignZookeeperToAnimal(animalId, zookeeperId) {
     }
 }
 
-export async function updateZookeeper(id, updatedData) {
+export async function updateZookeeper(id, updates) {
     try {
         const collection = await getCollection("zookeepers");
-        
-        // Convert string ID to ObjectId
-        const objectId = new ObjectId(id);
-        
-        // Remove _id from update data if it exists
-        const { _id, ...updateData } = updatedData;
-        
-        // If we're removing animal_id, use $unset
-        let updateOperation;
-        if (updateData.animal_id === undefined) {
-            updateOperation = { $unset: { animal_id: "" } };
-        } else {
-            updateOperation = { $set: updateData };
-        }
-        
         const result = await collection.updateOne(
-            { _id: objectId },
-            updateOperation
+            { _id: new ObjectId(id) },
+            { $set: updates }
         );
-        
-        if (result.matchedCount === 0) {
-            throw new Error('No document matched the ID');
-        }
+
         if (result.modifiedCount === 0) {
-            throw new Error('Document found but not modified');
+            throw new Error('Zookeeper not found');
         }
-        
-        return result;
+
+        // Get and return the updated zookeeper
+        return await getZookeeper(id);
     } catch (error) {
         console.error('DB: Error updating zookeeper:', error);
         throw error;
